@@ -31,5 +31,14 @@ export function createApp(config: RigConfig = loadConfig()) {
     );
   });
 
+  // Same reader as the page (plan § 2a): same rows, fields and order. ADR 0001.
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    const digest = readNight(config.runsDir, night);
+    if (!digest.found) return c.json({ error: 'no run log', night }, 404);
+    const { rows, badLines, totals } = digest;
+    return c.json({ night, rows, badLines, totals });
+  });
+
   return app;
 }
